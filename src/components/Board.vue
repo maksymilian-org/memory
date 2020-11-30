@@ -1,7 +1,40 @@
 <template>
-  <div class="container board mt-5">
-    <Progress :cols="cols" :done="done" />
-    <div class="columns is-multiline" v-if="notDone">
+  <div
+    class="container board mt-5 has-text-centered"
+    :style="{ maxWidth: 'calc(100vh - 8rem)' }"
+  >
+    <div class="columns is-vcentered">
+      <div class="column is-9">
+        <Progress :cols="cols" :done="done" />
+      </div>
+      <div class="column is-3">
+        <div class="field is-grouped is-grouped-right">
+          <p class="control">
+            <a class="button is-light" @click="cols > 5 ? (cols -= 2) : null">
+              -
+            </a>
+          </p>
+          <p class="control">
+            <input
+              class="input"
+              :style="{ textAlign: 'center', maxWidth: '60px' }"
+              type="number"
+              min="3"
+              max="12"
+              v-model="cols"
+              disabled
+            />
+          </p>
+          <p class="control">
+            <a class="button is-light" @click="cols < 5 ? (cols += 2) : null">
+              +
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-multiline is-mobile" v-if="notDone">
       <Card
         v-for="(card, index) in photos"
         v-bind:key="index"
@@ -46,9 +79,20 @@ export default {
       return this.done.length * 2 < Math.pow(this.cols, 2);
     },
   },
+  watch: {
+    cols: function() {
+      this.counter = 1;
+      this.done = [];
+      this.visible = [];
+      this.fetchPhotos();
+    },
+  },
   methods: {
     fetchPhotos: function() {
-      fetch(`https://picsum.photos/v2/list?limit=8&page=${this.photosPage}`)
+      fetch(
+        `https://picsum.photos/v2/list?limit=${Math.pow(this.cols, 2) /
+          2}&page=${this.photosPage}`
+      )
         .then((res) => res.json())
         .then((json) => {
           const photos = [...json, ...json]

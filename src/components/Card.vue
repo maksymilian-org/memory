@@ -1,6 +1,6 @@
 <template>
   <div
-    class="column is-3"
+    :class="`column is-${colsCount}`"
     @click="$emit('click-me', { id: card.id, uid: card.uid })"
   >
     <div class="card">
@@ -14,6 +14,16 @@ export default {
   name: 'Card',
   props: {
     card: Object,
+    cols: Number,
+  },
+  computed: {
+    colsCount: function() {
+      const map = {
+        4: '3',
+        6: '2',
+      };
+      return map[this.cols];
+    },
   },
 };
 </script>
